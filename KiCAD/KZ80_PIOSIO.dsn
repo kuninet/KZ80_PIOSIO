@@ -1265,7 +1265,7 @@
     )
     (net GND
       (pins C1-2 C2-2 C3-2 C4-2 C5-2 C7-2 C8-2 J6-2 J1-1 J2-1 J3-14 J4-14 J5-2 J5-4
-        U3-8 U5-12 U5-8 U4-5 U4-11 U1-31 U2-11 Q1-1)
+        U3-8 U5-12 U5-8 U4-5 U1-31 U2-11 Q1-1)
     )
     (net /D2
       (pins J5-11 U4-27 U1-39 U2-1)
@@ -1609,6 +1609,9 @@
     (net "Net-(J5-Pad7)"
       (pins J5-7)
     )
+    (net "Net-(U4-Pad11)"
+      (pins U4-11)
+    )
     (class kicad_default "" /A10 /A11 /A12 /A13 /A14 /A15 /A2 /A8 /A9 /D0
       /D1 /D2 /D3 /D4 /D5 /D6 /D7 /HALT /HLDA /HOLD /INT /RES /~BUSACK /~BUSREQ
       /~IOR /~IOW /~MEMR /~MEMRQ /~MEMW /~NMI /~RFSH /~WAIT /~WR A0 A1 A3
@@ -1618,12 +1621,12 @@
       "Net-(J7-Pad1)" "Net-(J7-Pad2)" "Net-(J7-Pad3)" "Net-(J7-Pad5)" "Net-(J7-Pad7)"
       "Net-(J8-Pad14)" "Net-(JP1-Pad1)" "Net-(JP1-Pad2)" "Net-(U1-Pad10)"
       "Net-(U1-Pad11)" "Net-(U1-Pad16)" "Net-(U1-Pad22)" "Net-(U1-Pad30)"
-      "Net-(U1-Pad7)" "Net-(U2-Pad22)" "Net-(U3-Pad7)" "Net-(U4-Pad21)" "Net-(U4-Pad22)"
-      "Net-(U5-Pad1)" "Net-(U5-Pad13)" "Net-(U5-Pad14)" "Net-(U5-Pad15)" "Net-(U5-Pad2)"
-      "Net-(U5-Pad3)" "Net-(U5-Pad4)" "Net-(U5-Pad5)" "Net-(U5-Pad6)" "Net-(U5-Pad9)"
-      PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7 "PIO-CE"
-      RTSA RTSB RxDA RxDB "SIO-CE" "SIO-CLK" SPK TxDA TxDB ~ASTB ~BSTB "~INT-J"
-      ~IORQ ~M1 ~RD ~RESET
+      "Net-(U1-Pad7)" "Net-(U2-Pad22)" "Net-(U3-Pad7)" "Net-(U4-Pad11)" "Net-(U4-Pad21)"
+      "Net-(U4-Pad22)" "Net-(U5-Pad1)" "Net-(U5-Pad13)" "Net-(U5-Pad14)" "Net-(U5-Pad15)"
+      "Net-(U5-Pad2)" "Net-(U5-Pad3)" "Net-(U5-Pad4)" "Net-(U5-Pad5)" "Net-(U5-Pad6)"
+      "Net-(U5-Pad9)" PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2 PB3 PB4
+      PB5 PB6 PB7 "PIO-CE" RTSA RTSB RxDA RxDB "SIO-CE" "SIO-CLK" SPK TxDA
+      TxDB ~ASTB ~BSTB "~INT-J" ~IORQ ~M1 ~RD ~RESET
       (circuit
         (use_via Via[0-1]_800:400_um)
       )
