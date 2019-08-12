@@ -4,6 +4,8 @@
 
 - 本ボードはSBC8080バス、およびZ80用信号線バスにつなげてZ80のZilog社製周辺デバイスを動作させるものです。
 - Z80-PIO、SIO/2、CTCを稼働させます。
+- 詳しい説明は、以下のwikiをご覧ください。
+    - https://github.com/kuninet/KZ80_PIOSIO/wiki
 
 ## 注意事項
 
