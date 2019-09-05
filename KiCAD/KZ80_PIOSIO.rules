@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 123)
+    (start_pass_no 10238)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -76,14 +76,15 @@
     ~RD ~ASTB ~IORQ ~BSTB ~M1 ARDY /D5 /D0
     /D4 /D1 /D3 "Net-(U1-Pad16)" CTSA RTSA "SIO-CE" TxDA
     "SIO-CLK" RxDA "Net-(U1-Pad11)" "Net-(U1-Pad30)" "Net-(U1-Pad10)" RxDB TxDB "Net-(U1-Pad22)"
-    RTSB CTSB ~RESET "CTC-CE" SPK "Net-(U4-Pad22)" "Net-(U4-Pad21)" "Net-(U5-Pad1)"
-    "Net-(U5-Pad9)" "Net-(U5-Pad2)" "Net-(U5-Pad3)" "Net-(U5-Pad4)" "Net-(U5-Pad5)" "Net-(U5-Pad13)" "Net-(U5-Pad6)" "Net-(U5-Pad14)"
-    "Net-(U5-Pad15)" "Net-(JP1-Pad2)" "Net-(U3-Pad7)" A5 A6 "Net-(J7-Pad1)" "Net-(J7-Pad3)" A4
-    "Net-(J7-Pad5)" A3 "Net-(J7-Pad7)" "Net-(J7-Pad2)" /~IOR /~IOW /RES /INT
-    /A2 /A8 /A10 /A12 /A14 /A15 /A13 /A11
-    /A9 /HOLD /HLDA /~MEMW /~MEMR /~WR /~MEMRQ /~BUSREQ
-    /~BUSACK /~NMI /~RFSH /~WAIT /HALT "Net-(J8-Pad14)" "Net-(J4-Pad12)" "Net-(J4-Pad11)"
-    "Net-(J3-Pad11)" "Net-(J3-Pad12)" "Net-(J2-Pad3)" "Net-(J1-Pad3)" "Net-(J5-Pad5)" "Net-(J5-Pad6)" "Net-(J5-Pad7)" "Net-(U4-Pad11)"
+    RTSB CTSB ~RESET "CTC-CE" "Net-(U4-Pad22)" "Net-(U5-Pad1)" "Net-(U5-Pad9)" "Net-(U5-Pad2)"
+    "Net-(U5-Pad3)" "Net-(U5-Pad4)" "Net-(U5-Pad5)" "Net-(U5-Pad13)" "Net-(U5-Pad6)" "Net-(U5-Pad14)" "Net-(U5-Pad15)" "Net-(JP1-Pad2)"
+    "Net-(U3-Pad7)" A5 A6 "Net-(J7-Pad1)" "Net-(J7-Pad3)" A4 "Net-(J7-Pad5)" A3
+    "Net-(J7-Pad7)" "Net-(J7-Pad2)" /~IOR /~IOW /RES /INT /A2 /A8
+    /A10 /A12 /A14 /A15 /A13 /A11 /A9 /HOLD
+    /HLDA /~MEMW /~MEMR /~WR /~MEMRQ /~BUSREQ /~BUSACK /~NMI
+    /~RFSH /~WAIT /HALT "Net-(J8-Pad14)" "Net-(J4-Pad12)" "Net-(J4-Pad11)" "Net-(J3-Pad11)" "Net-(J3-Pad12)"
+    "Net-(J2-Pad3)" "Net-(J1-Pad3)" "Net-(J5-Pad5)" "Net-(J5-Pad6)" "Net-(J5-Pad7)" "Net-(U4-Pad11)" "Net-(J6-Pad1)" "Net-(JP2-Pad3)"
+    "Net-(JP2-Pad1)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
@@ -94,7 +95,7 @@
     )
   )
   (class BOLD
-    GND VCC
+    VCC GND
     (clearance_class BOLD)
     (via_rule BOLD)
     (rule
