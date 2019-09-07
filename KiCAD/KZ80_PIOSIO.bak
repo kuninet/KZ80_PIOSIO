@@ -835,7 +835,7 @@ NoConn ~ 2800 6150
 NoConn ~ 3300 6150
 NoConn ~ 2800 7150
 NoConn ~ 3300 7150
-Text GLabel 8500 3200 2    50   Output ~ 0
+Text GLabel 9150 3500 2    50   Output ~ 0
 SIO-CLK
 Wire Wire Line
 	8000 3200 8500 3200
@@ -853,15 +853,11 @@ Wire Wire Line
 	8200 2800 8000 2800
 Wire Wire Line
 	8000 2900 8200 2900
-Text GLabel 8500 2900 2    50   Output ~ 0
-SPK
 Wire Wire Line
 	8200 2900 8200 3400
 Wire Wire Line
 	8200 3400 8000 3400
 Connection ~ 8200 2900
-Wire Wire Line
-	8200 2900 8500 2900
 $Comp
 L Connector_Generic:Conn_02x20_Odd_Even J5
 U 1 1 5CDC49CD
@@ -1180,21 +1176,17 @@ Wire Wire Line
 Wire Wire Line
 	10750 750  10750 900 
 Connection ~ 10400 750 
-Text GLabel 9400 2950 0    50   Input ~ 0
-SPK
 $Comp
 L Connector_Generic:Conn_01x02 J6
 U 1 1 5DD55A2A
-P 9950 2950
-F 0 "J6" H 10030 2942 50  0000 L CNN
-F 1 "Conn_01x02" H 10030 2851 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Horizontal" H 9950 2950 50  0001 C CNN
-F 3 "~" H 9950 2950 50  0001 C CNN
-	1    9950 2950
+P 9950 2900
+F 0 "J6" H 10030 2892 50  0000 L CNN
+F 1 "SPK_JP" H 10030 2801 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Horizontal" H 9950 2900 50  0001 C CNN
+F 3 "~" H 9950 2900 50  0001 C CNN
+	1    9950 2900
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9400 2950 9750 2950
 $Comp
 L power:GND #PWR015
 U 1 1 5DDB6655
@@ -1207,9 +1199,9 @@ F 3 "" H 9550 3150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9550 3150 9550 3050
+	9550 3150 9550 3000
 Wire Wire Line
-	9550 3050 9750 3050
+	9550 3000 9750 3000
 NoConn ~ 10150 950 
 NoConn ~ 9650 950 
 NoConn ~ 9650 1050
@@ -1444,7 +1436,7 @@ U 1 1 5D5505E8
 P 9450 4350
 F 0 "J8" H 9500 4867 50  0000 C CNN
 F 1 "Z80 CONTROL" H 9500 4776 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x07_P2.54mm_Vertical" H 9450 4350 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x07_P2.54mm_Horizontal" H 9450 4350 50  0001 C CNN
 F 3 "~" H 9450 4350 50  0001 C CNN
 	1    9450 4350
 	1    0    0    -1  
@@ -1788,7 +1780,7 @@ U 1 1 5CE21DB3
 P 6500 5900
 F 0 "C9" H 6618 5946 50  0000 L CNN
 F 1 "10u" H 6618 5855 50  0000 L CNN
-F 2 "" H 6538 5750 50  0001 C CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 6538 5750 50  0001 C CNN
 F 3 "~" H 6500 5900 50  0001 C CNN
 	1    6500 5900
 	1    0    0    -1  
@@ -1801,6 +1793,30 @@ Wire Wire Line
 	6500 6050 6500 6100
 Wire Wire Line
 	6500 6100 6850 6100
+$Comp
+L Jumper:Jumper_3_Open JP2
+U 1 1 5D57F31F
+P 8850 3500
+F 0 "JP2" V 8896 3587 50  0000 L CNN
+F 1 "SIO_JP" V 8805 3587 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical" H 8850 3500 50  0001 C CNN
+F 3 "~" H 8850 3500 50  0001 C CNN
+	1    8850 3500
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8850 2500 8850 3250
+Connection ~ 8850 2500
+Wire Wire Line
+	8500 3200 8500 3850
+Wire Wire Line
+	8500 3850 8850 3850
+Wire Wire Line
+	8850 3850 8850 3750
+Wire Wire Line
+	9000 3500 9150 3500
+Wire Wire Line
+	8200 2900 9750 2900
 Wire Bus Line
 	4000 1750 4000 2950
 Wire Bus Line
