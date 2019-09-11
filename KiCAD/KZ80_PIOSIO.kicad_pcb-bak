@@ -2726,10 +2726,10 @@
     )
   )
 
-  (gr_text 4060 (at 169.95 58.63 90) (layer F.SilkS) (tstamp 5D5ACA9E)
+  (gr_text 4060 (at 170.2 63.8 90) (layer F.SilkS) (tstamp 5D5ACA9E)
     (effects (font (size 1 1) (thickness 0.15)))
   )
-  (gr_text CTC (at 170.03 64.16 90) (layer F.SilkS) (tstamp 5D5ACA95)
+  (gr_text CTC (at 170.2 58.8 90) (layer F.SilkS) (tstamp 5D5ACA95)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (gr_text "Z80 CTRL" (at 188.675 58.325 90) (layer F.SilkS)
