@@ -1,0 +1,433 @@
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM - Page 1 - 2020/03/03 21時10分54秒
+
+
+       1/       0 :                     ;
+       2/       0 :                     ; I2C RTC(DS3231) READ for KZ80-ZilogIO (use PIO)
+       3/       0 :                     ;      KUNI-NET 2020
+       4/       0 :                     ;
+       5/       0 : =68H                RTC_ADDR EQU 68h
+       6/       0 :                     ;
+       7/    8000 :                             ORG     8000h
+       8/    8000 : C3 0A 80                    JP      PGM_START
+       9/    8003 :                     ;
+      10/    8003 : =8003H              RTC_DATA   EQU $  
+      11/    8003 :                     RTC_SEC    DS 1
+      12/    8004 :                     RTC_MIN    DS 1
+      13/    8005 :                     RTC_HOUR   DS 1
+      14/    8006 :                     RTC_DAY    DS 1
+      15/    8007 :                     RTC_DAY_W  DS 1
+      16/    8008 :                     RTC_MON    DS 1 
+      17/    8009 :                     RTC_YEAR   DS 1
+      18/    800A :                     ;
+      19/    800A :                     PGM_START:
+      20/    800A : CD CB 80                    CALL INI_PIO
+      21/    800D : CD 4F 81                    CALL SDA_IN     ; SDA = H
+      22/    8010 : CD DE 80                    CALL RST_I2C
+      23/    8013 :                     ;
+      24/    8013 : CD E9 80                    CALL I2C_START
+      25/    8016 : 3E 68                       LD A,RTC_ADDR
+      26/    8018 : CD 07 81                    CALL I2C_ctl_w  ; Slave Addr(W) Send
+      27/    801B :                     ;
+      28/    801B : 3E 00                       LD A,0
+      29/    801D : CD FA 80                    CALL I2C_tx
+      30/    8020 :                     ;
+      31/    8020 :                     ;Repeated Start Condition
+      32/    8020 :                     ;
+      33/    8020 : CD 5F 81                    CALL SDA_OUT
+      34/    8023 : CD 4F 81                    CALL SDA_IN
+      35/    8026 : CD 6F 81                    CALL SCL_IN
+      36/    8029 : CD E9 80                    CALL I2C_START
+      37/    802C :                     ;
+      38/    802C :                     ; RTC DATA READ
+      39/    802C :                     ;
+      40/    802C : 3E 68                       LD A,RTC_ADDR
+      41/    802E : CD 0F 81                    CALL I2C_ctl_r  ; Slave Addr(R) Send
+      42/    8031 :                     ;
+      43/    8031 : 21 03 80                    LD HL,RTC_DATA
+      44/    8034 : 06 07                       LD B,7
+      45/    8036 :                     I2C_LOOP:
+      46/    8036 : C5                          PUSH BC
+      47/    8037 : CD 17 81                    CALL I2C_rx
+      48/    803A : 77                          LD (HL),A
+      49/    803B : 23                          INC HL
+      50/    803C : C1                          POP BC
+      51/    803D : 10 F7                       DJNZ I2C_LOOP
+      52/    803F : CD F0 80                    CALL I2C_STOP
+      53/    8042 :                     ;
+      54/    8042 : CD 46 80                    CALL PRINT_DT
+      55/    8045 :                     ;
+      56/    8045 : C9                          RET
+      57/    8046 :                     ;
+      58/    8046 :                     ; DATE / TIME PRINT (for KZ80-Monitor)
+      59/    8046 :                     ;
+      60/    8046 :                     PRINT_DT:
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM - Page 2 - 2020/03/03 21時10分54秒
+
+
+      61/    8046 : 3A 09 80                    LD A,(RTC_YEAR)
+      62/    8049 : CD 80 80                    CALL PRINT_2BCD
+      63/    804C : 3E 2F                       LD A,'/'
+      64/    804E : CF                          RST 08h
+      65/    804F : 3A 08 80                    LD A,(RTC_MON)
+      66/    8052 : CD 80 80                    CALL PRINT_2BCD
+      67/    8055 : 3E 2F                       LD A,'/'
+      68/    8057 : CF                          RST 08h
+      69/    8058 : 3A 07 80                    LD A,(RTC_DAY_W)
+      70/    805B : CD 80 80                    CALL PRINT_2BCD
+      71/    805E :                     ;
+      72/    805E : CD 93 80                    CALL PRINT_DAY
+      73/    8061 :                     ;
+      74/    8061 : 3A 05 80                    LD A,(RTC_HOUR)
+      75/    8064 : CD 80 80                    CALL PRINT_2BCD
+      76/    8067 : 3E 3A                       LD A,':'
+      77/    8069 : CF                          RST 08h
+      78/    806A : 3A 04 80                    LD A,(RTC_MIN)
+      79/    806D : CD 80 80                    CALL PRINT_2BCD
+      80/    8070 : 3E 3A                       LD A,':'
+      81/    8072 : CF                          RST 08h
+      82/    8073 : 3A 03 80                    LD A,(RTC_SEC)
+      83/    8076 : CD 80 80                    CALL PRINT_2BCD
+      84/    8079 : 3E 0D                       LD A,0Dh
+      85/    807B : CF                          RST 08h
+      86/    807C : 3E 0A                       LD A,0Ah
+      87/    807E : CF                          RST 08h
+      88/    807F : C9                          RET
+      89/    8080 :                     ;
+      90/    8080 :                     PRINT_2BCD:
+      91/    8080 : 4F                          LD C,A
+      92/    8081 : CB 2F                       SRA A
+      93/    8083 : CB 2F                       SRA A
+      94/    8085 : CB 2F                       SRA A
+      95/    8087 : CB 2F                       SRA A
+      96/    8089 : C6 30                       ADD A,'0'
+      97/    808B : CF                          RST 08h
+      98/    808C :                     ;
+      99/    808C : 79                          LD A,C
+     100/    808D : E6 0F                       AND A,0Fh
+     101/    808F : C6 30                       ADD A,'0'
+     102/    8091 : CF                          RST 08h
+     103/    8092 :                     ;
+     104/    8092 : C9                          RET
+     105/    8093 :                     
+     106/    8093 :                     PRINT_DAY:
+     107/    8093 : 21 AF 80                    LD HL,YOBI
+     108/    8096 : 3A 06 80                    LD A,(RTC_DAY)
+     109/    8099 : 3D                          DEC A
+     110/    809A : CB 27                       SLA A
+     111/    809C : CB 27                       SLA A
+     112/    809E : 85                          ADD A,L
+     113/    809F : 6F                          LD  L,A
+     114/    80A0 : 3E 00                       LD  A,0
+     115/    80A2 : 8C                          ADC A,H
+     116/    80A3 : 67                          LD  H,A
+     117/    80A4 :                     ;
+     118/    80A4 : 06 04                       LD B,4
+     119/    80A6 :                     PRINT_DAY_L:
+     120/    80A6 : 7E                          LD A,(HL)
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM - Page 3 - 2020/03/03 21時10分54秒
+
+
+     121/    80A7 : CF                          RST 08h
+     122/    80A8 : 23                          INC HL
+     123/    80A9 : 10 FB                       DJNZ PRINT_DAY_L
+     124/    80AB : 3E 20                       LD  A,' '
+     125/    80AD : CF                          RST 08h
+     126/    80AE : C9                          RET
+     127/    80AF :                     ;
+     128/    80AF : 20 53 55 4E 20 4D   YOBI    DB " SUN MON TUE WED THU FRI SAT"
+                    4F 4E 20 54 55 45 
+                    20 57 45 44 20 54 
+                    48 55 20 46 52 49 
+                    20 53 41 54       
+     129/    80CB :                     
+     130/    80CB :                             include "Z80PIO_I2C.ASM"
+(1)    1/    80CB :                     ;**********************************************************************
+(1)    2/    80CB :                     ; Z80 PIO I2C DRIVER
+(1)    3/    80CB :                     ;   http://www.blunk-electronic.de//train-z/pdf/howto_program_I2C.pdf
+(1)    4/    80CB :                     ;**********************************************************************
+(1)    5/    80CB :                     
+(1)    6/    80CB :                     ; PIO I/O Address EQU
+(1)    7/    80CB :                     ;
+(1)    8/    80CB : =9H                 PIO_B_D		equ	09h
+(1)    9/    80CB : =0BH                PIO_B_C		equ 	0Bh
+(1)   10/    80CB :                     ;--------------------------------------
+(1)   11/    80CB :                     ; Z80 PIO INIT
+(1)   12/    80CB :                     ;--------------------------------------
+(1)   13/    80CB :                     INI_PIO:
+(1)   14/    80CB :                     	;init PIO Port B
+(1)   15/    80CB :                     
+(1)   16/    80CB :                     	; PIO-B bit mode
+(1)   17/    80CB : 3E CF               	LD	A,0CFh
+(1)   18/    80CD : 32 AC 81            	LD	(PIO_B_MODE),A
+(1)   19/    80D0 : D3 0B               	OUT	(PIO_B_C),A
+(1)   20/    80D2 :                     
+(1)   21/    80D2 :                     	; set Input Mode
+(1)   22/    80D2 : 3E FF               	LD	A,0FFh
+(1)   23/    80D4 : 32 AD 81            	LD	(PIO_B_CONF),A
+(1)   24/    80D7 : D3 0B               	OUT	(PIO_B_C),A
+(1)   25/    80D9 :                     
+(1)   26/    80D9 :                     	; pin direction B0,B1 = OUTPUT
+(1)   27/    80D9 : 3E FC               	LD	A,0FCh
+(1)   28/    80DB : D3 09               	OUT	(PIO_B_D),A
+(1)   29/    80DD : C9                  	RET
+(1)   30/    80DE :                     
+(1)   31/    80DE :                     ;--------------------------------------
+(1)   32/    80DE :                     ; I2C Bus Reset
+(1)   33/    80DE :                     ;--------------------------------------
+(1)   34/    80DE :                     RST_I2C:
+(1)   35/    80DE : 06 0A               	LD	B,0Ah
+(1)   36/    80E0 :                     RST_I2C_L:
+(1)   37/    80E0 : CD 42 81            	CALL	SCL_CYCLE
+(1)   38/    80E3 : 10 FB               	DJNZ	RST_I2C_L
+(1)   39/    80E5 : CD 6F 81            	CALL	SCL_IN     ; SCL = H
+(1)   40/    80E8 : C9                  	RET
+(1)   41/    80E9 :                     
+(1)   42/    80E9 :                     ;--------------------------------------
+(1)   43/    80E9 :                     ; I2C START/STOP
+(1)   44/    80E9 :                     ;--------------------------------------
+(1)   45/    80E9 :                     I2C_START:
+(1)   46/    80E9 : CD 5F 81            	CALL	SDA_OUT  ; SDA = L
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM(Z80PIO_I2C.ASM) - Page 4 - 2020/03/03 21時10分54秒
+
+
+(1)   47/    80EC : CD 7F 81            	CALL	SCL_OUT  ; SCL = L
+(1)   48/    80EF : C9                  	RET
+(1)   49/    80F0 :                     
+(1)   50/    80F0 :                     
+(1)   51/    80F0 :                     I2C_STOP:
+(1)   52/    80F0 : CD 5F 81            	CALL	SDA_OUT  ; SDA = L
+(1)   53/    80F3 : CD 6F 81            	CALL	SCL_IN   ; SCL = H
+(1)   54/    80F6 : CD 4F 81            	CALL	SDA_IN	 ; SDA = H
+(1)   55/    80F9 : C9                  	RET
+(1)   56/    80FA :                     
+(1)   57/    80FA :                     
+(1)   58/    80FA :                     ;--------------------------------------
+(1)   59/    80FA :                     ; I2C Transmit
+(1)   60/    80FA :                     ;--------------------------------------
+(1)   61/    80FA :                     I2C_tx:
+(1)   62/    80FA : CD 8F 81            	CALL	SEND_BYTE
+(1)   63/    80FD : CB 4A               	BIT	1,D
+(1)   64/    80FF : 37                  	SCF
+(1)   65/    8100 : C8                  	RET Z
+(1)   66/    8101 :                     ;
+(1)   67/    8101 :                     ; ACK error
+(1)   68/    8101 : CD F0 80            	CALL	I2C_STOP
+(1)   69/    8104 : 37                  	SCF
+(1)   70/    8105 : 3F                  	CCF
+(1)   71/    8106 : C9                  	RET
+(1)   72/    8107 :                     
+(1)   73/    8107 :                     ;--------------------------------------
+(1)   74/    8107 :                     ; I2C COLTROL (W)
+(1)   75/    8107 :                     ;--------------------------------------
+(1)   76/    8107 :                     I2C_ctl_w:
+(1)   77/    8107 : CB 27               	SLA A
+(1)   78/    8109 : CB 87               	RES 0,A         ; I2C WRITE MODE
+(1)   79/    810B : CD FA 80            	CALL I2C_tx
+(1)   80/    810E : C9                  	RET
+(1)   81/    810F :                     
+(1)   82/    810F :                     ;--------------------------------------
+(1)   83/    810F :                     ; I2C COLTROL (R)
+(1)   84/    810F :                     ;--------------------------------------
+(1)   85/    810F :                     I2C_ctl_r:
+(1)   86/    810F : CB 27               	SLA A
+(1)   87/    8111 : CB C7               	SET 0,A         ; I2C READ MODE
+(1)   88/    8113 : CD FA 80            	CALL I2C_tx
+(1)   89/    8116 : C9                  	RET
+(1)   90/    8117 :                     
+(1)   91/    8117 :                     ;--------------------------------------
+(1)   92/    8117 :                     ; I2C Receive
+(1)   93/    8117 :                     ;--------------------------------------
+(1)   94/    8117 :                     I2C_rx:
+(1)   95/    8117 : 06 08               	LD	B,8h
+(1)   96/    8119 :                     I2C_rx_L:
+(1)   97/    8119 : DB 09               	IN	A,(PIO_B_D)
+(1)   98/    811B : 37                  	SCF
+(1)   99/    811C : CB 4F               	BIT	1,A
+(1)  100/    811E : C2 22 81            	JP 	NZ,I2C_rx_H_FOUND
+(1)  101/    8121 :                     I2C_rx_L_FOUND:
+(1)  102/    8121 : 3F                  	CCF
+(1)  103/    8122 :                     I2C_rx_H_FOUND:
+(1)  104/    8122 : CB 11               	RL	C
+(1)  105/    8124 : CD 42 81            	CALL	SCL_CYCLE
+(1)  106/    8127 : 10 F0               	DJNZ    I2C_rx_L
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM(Z80PIO_I2C.ASM) - Page 5 - 2020/03/03 21時10分54秒
+
+
+(1)  107/    8129 :                     ;
+(1)  108/    8129 : CD 2E 81            	CALL  SEND_ACK
+(1)  109/    812C : 79                  	LD	A,C
+(1)  110/    812D : C9                  	RET
+(1)  111/    812E :                     
+(1)  112/    812E :                     ;=============================
+(1)  113/    812E :                     ; S U B R O U T I N E
+(1)  114/    812E :                     ;=============================
+(1)  115/    812E :                     ;--------------------------------------
+(1)  116/    812E :                     ; SEND ACK
+(1)  117/    812E :                     ;--------------------------------------
+(1)  118/    812E :                     SEND_ACK:
+(1)  119/    812E : CD 7F 81            	CALL	SCL_OUT
+(1)  120/    8131 : CD 5F 81            	CALL	SDA_OUT
+(1)  121/    8134 : CD 6F 81            	CALL	SCL_IN
+(1)  122/    8137 : 00                  	NOP
+(1)  123/    8138 : 00                  	NOP
+(1)  124/    8139 : 00                  	NOP
+(1)  125/    813A : 00                  	NOP
+(1)  126/    813B : CD 7F 81            	CALL	SCL_OUT
+(1)  127/    813E : CD 4F 81            	CALL	SDA_IN
+(1)  128/    8141 :                     ;
+(1)  129/    8141 : C9                  	RET
+(1)  130/    8142 :                     ;--------------------------------------
+(1)  131/    8142 :                     ; SCL_SYCLE
+(1)  132/    8142 :                     ;--------------------------------------
+(1)  133/    8142 :                     SCL_CYCLE:
+(1)  134/    8142 : CD 7F 81            	CALL	SCL_OUT
+(1)  135/    8145 : CD 6F 81            	CALL	SCL_IN
+(1)  136/    8148 : DB 09               	IN	A,(PIO_B_D)
+(1)  137/    814A : 57                  	LD	D,A
+(1)  138/    814B : CD 7F 81            	CALL	SCL_OUT
+(1)  139/    814E : C9                  	RET
+(1)  140/    814F :                     
+(1)  141/    814F :                     ;--------------------------------------
+(1)  142/    814F :                     ; SDA_IN/OUT
+(1)  143/    814F :                     ;--------------------------------------
+(1)  144/    814F :                     SDA_IN:
+(1)  145/    814F : 3A AC 81            	LD	A,(PIO_B_MODE)
+(1)  146/    8152 : D3 0B               	OUT	(PIO_B_C),A
+(1)  147/    8154 :                     
+(1)  148/    8154 : 3A AD 81            	LD	A,(PIO_B_CONF)
+(1)  149/    8157 : CB CF               	SET	1,A
+(1)  150/    8159 : D3 0B               	OUT	(PIO_B_C),A
+(1)  151/    815B : 32 AD 81            	LD	(PIO_B_CONF),A
+(1)  152/    815E : C9                  	RET
+(1)  153/    815F :                     
+(1)  154/    815F :                     SDA_OUT:
+(1)  155/    815F : 3A AC 81            	LD	A,(PIO_B_MODE)
+(1)  156/    8162 : D3 0B               	OUT	(PIO_B_C),A
+(1)  157/    8164 :                     
+(1)  158/    8164 : 3A AD 81            	LD	A,(PIO_B_CONF)
+(1)  159/    8167 : CB 8F               	RES	1,A
+(1)  160/    8169 : D3 0B               	OUT	(PIO_B_C),A
+(1)  161/    816B : 32 AD 81            	LD	(PIO_B_CONF),A
+(1)  162/    816E : C9                  	RET
+(1)  163/    816F :                     
+(1)  164/    816F :                     ;--------------------------------------
+(1)  165/    816F :                     ; SCL_IN/OUT
+(1)  166/    816F :                     ;--------------------------------------
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM(Z80PIO_I2C.ASM) - Page 6 - 2020/03/03 21時10分54秒
+
+
+(1)  167/    816F :                     SCL_IN:
+(1)  168/    816F : 3A AC 81            	LD	A,(PIO_B_MODE)
+(1)  169/    8172 : D3 0B               	OUT	(PIO_B_C),A
+(1)  170/    8174 :                     
+(1)  171/    8174 : 3A AD 81            	LD	A,(PIO_B_CONF)
+(1)  172/    8177 : CB C7               	SET	0,A
+(1)  173/    8179 : D3 0B               	OUT	(PIO_B_C),A
+(1)  174/    817B : 32 AD 81            	LD	(PIO_B_CONF),A
+(1)  175/    817E : C9                  	RET
+(1)  176/    817F :                     
+(1)  177/    817F :                     
+(1)  178/    817F :                     
+(1)  179/    817F :                     SCL_OUT:
+(1)  180/    817F : 3A AC 81            	LD	A,(PIO_B_MODE)
+(1)  181/    8182 : D3 0B               	OUT	(PIO_B_C),A
+(1)  182/    8184 :                     
+(1)  183/    8184 : 3A AD 81            	LD	A,(PIO_B_CONF)
+(1)  184/    8187 : CB 87               	RES	0,A
+(1)  185/    8189 : D3 0B               	OUT	(PIO_B_C),A
+(1)  186/    818B : 32 AD 81            	LD	(PIO_B_CONF),A
+(1)  187/    818E : C9                  	RET
+(1)  188/    818F :                     
+(1)  189/    818F :                     ;--------------------------------------
+(1)  190/    818F :                     ; Send 1Byte
+(1)  191/    818F :                     ;--------------------------------------
+(1)  192/    818F :                     SEND_BYTE:
+(1)  193/    818F : 06 08               	LD	B,8h
+(1)  194/    8191 : 4F                  	LD	C,A
+(1)  195/    8192 :                     SEND_BYTE_L1:
+(1)  196/    8192 : CB 21               	SLA	C
+(1)  197/    8194 : DA 9D 81            	JP	C,SEND_BYTE_SDA_H
+(1)  198/    8197 :                     SEND_BYTE_SDA_L:
+(1)  199/    8197 : CD 5F 81            	CALL	SDA_OUT
+(1)  200/    819A : C3 A0 81            	JP	SEND_BYTE_L2
+(1)  201/    819D :                     ;
+(1)  202/    819D :                     SEND_BYTE_SDA_H:
+(1)  203/    819D : CD 4F 81            	CALL	SDA_IN
+(1)  204/    81A0 :                     SEND_BYTE_L2:
+(1)  205/    81A0 : CD 42 81            	CALL	SCL_CYCLE
+(1)  206/    81A3 : 10 ED               	DJNZ	SEND_BYTE_L1
+(1)  207/    81A5 : CD 4F 81            	CALL	SDA_IN
+(1)  208/    81A8 : CD 42 81            	CALL	SCL_CYCLE
+(1)  209/    81AB : C9                  	RET
+(1)  210/    81AC :                     ;
+(1)  211/    81AC : =81ACH              WORK_TOP	EQU	$
+(1)  212/    81AC :                     ;
+(1)  213/    81AC :                     ; Wok Area
+(1)  214/    81AC :                     ;
+(1)  215/    81AC :                     PIO_B_MODE	DS 1
+(1)  216/    81AD :                     PIO_B_CONF	DS 1
+(1)  217/    81AE :                     
+(1)  218/    81AE :                     
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM - Page 7 - 2020/03/03 21時10分54秒
+
+
+  Symbol Table (* = unused):
+  --------------------------
+
+*ARCHITECTURE :    x86_64-apple-osx - | *BIGENDIAN :                      0 - |
+*BRANCHEXT :                      0 - | *CASESENSITIVE :                  0 - |
+*CONSTPI :        3.141592653589793 - | *DATE :                  2020/03/03 - |
+*FALSE :                          0 - | *FULLPMMU :                       1 - |
+*HAS64 :                          1 - | *HASDSP :                         0 - |
+*HASFPU :                         0 - | *HASPMMU :                        0 - |
+ I2C_CTL_R :                   810F C |  I2C_CTL_W :                   8107 C |
+ I2C_LOOP :                    8036 C |  I2C_RX :                      8117 C |
+ I2C_RX_H_FOUND :              8122 C |  I2C_RX_L :                    8119 C |
+*I2C_RX_L_FOUND :              8121 C |  I2C_START :                   80E9 C |
+ I2C_STOP :                    80F0 C |  I2C_TX :                      80FA C |
+*INEXTMODE :                      0 - |  INI_PIO :                     80CB C |
+*INLWORDMODE :                    0 - | *INMAXMODE :                      0 - |
+*INSRCMODE :                      0 - | *INSUPMODE :                      0 - |
+*LISTON :                         1 - | *MACEXP :                         7 - |
+*MOMCPU :                        80 - | *MOMCPUNAME :                   Z80 - |
+*NESTMAX :                      100 - | *PACKING :                        0 - |
+*PADDING :                        1 - |  PGM_START :                   800A C |
+ PIO_B_C :                        B - |  PIO_B_CONF :                  81AD C |
+ PIO_B_D :                        9 - |  PIO_B_MODE :                  81AC C |
+ PRINT_2BCD :                  8080 C |  PRINT_DAY :                   8093 C |
+ PRINT_DAY_L :                 80A6 C |  PRINT_DT :                    8046 C |
+*RELAXED :                        0 - |  RST_I2C :                     80DE C |
+ RST_I2C_L :                   80E0 C |  RTC_ADDR :                      68 - |
+ RTC_DATA :                    8003 - |  RTC_DAY :                     8006 C |
+ RTC_DAY_W :                   8007 C |  RTC_HOUR :                    8005 C |
+ RTC_MIN :                     8004 C |  RTC_MON :                     8008 C |
+ RTC_SEC :                     8003 C |  RTC_YEAR :                    8009 C |
+ SCL_CYCLE :                   8142 C |  SCL_IN :                      816F C |
+ SCL_OUT :                     817F C |  SDA_IN :                      814F C |
+ SDA_OUT :                     815F C |  SEND_ACK :                    812E C |
+ SEND_BYTE :                   818F C |  SEND_BYTE_L1 :                8192 C |
+ SEND_BYTE_L2 :                81A0 C |  SEND_BYTE_SDA_H :             819D C |
+*SEND_BYTE_SDA_L :             8197 C |
+*TIME :                 21\-026\-103\-12610\-027\-120\-12254\-025\-089\-110 - |
+*TRUE :                           1 - | *VERSION :                     142F - |
+*WORK_TOP :                    81AC - |  YOBI :                        80AF C |
+
+     72 Symbols
+     31 unused symbols
+
+ AS V1.42 Beta [Bld 150] - Source File I2C-RTC.ASM - Page 8 - 2020/03/03 21時10分54秒
+
+
+  Code Pages:
+  ----------
+
+STANDARD (0 changed characters)
+
+1 code page
+
+0.01 seconds assembly time
+
+    348 lines source file
+      2 passes
+      0 errors
+      0 warnings
