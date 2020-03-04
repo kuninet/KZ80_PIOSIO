@@ -216,9 +216,9 @@ Wire Wire Line
 Wire Wire Line
 	6550 3700 7200 3700
 Text GLabel 5400 3600 0    50   BiDi ~ 0
-PB0
+PC0
 Text GLabel 5400 3800 0    50   BiDi ~ 0
-PB1
+PC4
 NoConn ~ 3950 3950
 NoConn ~ 3950 4050
 NoConn ~ 3950 4150
