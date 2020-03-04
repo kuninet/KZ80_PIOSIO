@@ -136,14 +136,14 @@ SCL_CYCLE:
 ;--------------------------------------
 SDA_IN:
 	LD	A,(PPI_C_CONF)
-	SET	0,A
+	SET	3,A
 	OUT	(PPI_CTL),A
 	LD	(PPI_C_CONF),A
 	RET
 
 SDA_OUT:
 	LD	A,(PPI_C_CONF)
-	RES	0,A
+	RES	3,A
 	OUT	(PPI_CTL),A
 	LD	(PPI_C_CONF),A
 	RET
@@ -153,7 +153,7 @@ SDA_OUT:
 ;--------------------------------------
 SCL_IN:
 	LD	A,(PPI_C_CONF)
-	SET	3,A
+	SET	0,A
 	OUT	(PPI_CTL),A
 	LD	(PPI_C_CONF),A
 	RET
@@ -162,7 +162,7 @@ SCL_IN:
 
 SCL_OUT:
 	LD	A,(PPI_C_CONF)
-	RES	3,A
+	RES	0,A
 	OUT	(PPI_CTL),A
 	LD	(PPI_C_CONF),A
 	RET
