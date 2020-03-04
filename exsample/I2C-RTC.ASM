@@ -17,7 +17,7 @@ RTC_MON    DS 1
 RTC_YEAR   DS 1
 ;
 PGM_START:
-        CALL INI_PIO
+        CALL INI_LSI
         CALL SDA_IN     ; SDA = H
         CALL RST_I2C
 ;
@@ -127,4 +127,11 @@ PRINT_DAY_L:
 ;
 YOBI    DB " SUN MON TUE WED THU FRI SAT"
 
-        include "Z80PIO_I2C.ASM"
+
+        IFDEF PIO
+                include "Z80PIO_I2C.ASM"
+        ENDIF
+        
+        IFDEF PPI
+                include "PPI_I2C.ASM"
+        ENDIF
