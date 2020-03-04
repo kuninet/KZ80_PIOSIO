@@ -1,31 +1,24 @@
 ;**********************************************************************
-; Z80 PIO I2C DRIVER
-;   http://www.blunk-electronic.de//train-z/pdf/howto_program_I2C.pdf
+; 8255 PPI I2C DRIVER
 ;**********************************************************************
 
-; PIO I/O Address EQU
+; PPI I/O Address EQU
 ;
-PIO_B_D		equ	09h
-PIO_B_C		equ 	0Bh
+PPI_A		equ	08h
+PPI_B		equ 09h
+PPI_C		equ 0Ah
+PPI_CTL		equ 0Bh
+;
+PPI_INIT	equ 10001001b        ; Port C = IN , PortA/B = OUT
+;
 ;--------------------------------------
-; Z80 PIO INIT
+; 8255 PPI INIT
 ;--------------------------------------
 INI_LSI:
-	;init PIO Port B
-
-	; PIO-B bit mode
-	LD	A,0CFh
-	LD	(PIO_B_MODE),A
-	OUT	(PIO_B_C),A
-
 	; set Input Mode
-	LD	A,0FFh
-	LD	(PIO_B_CONF),A
-	OUT	(PIO_B_C),A
-
-	; pin direction B0,B1 = OUTPUT
-	LD	A,0FCh
-	OUT	(PIO_B_D),A
+	LD	A,PPI_INIT
+	LD	(PPI_C_CONF),A
+	OUT	(PPI_CTL),A
 	RET
 
 ;--------------------------------------
@@ -60,7 +53,7 @@ I2C_STOP:
 ;--------------------------------------
 I2C_tx:
 	CALL	SEND_BYTE
-	BIT	1,D
+	BIT	4,D
 	SCF
 	RET Z
 ;
@@ -94,9 +87,9 @@ I2C_ctl_r:
 I2C_rx:
 	LD	B,8h
 I2C_rx_L:
-	IN	A,(PIO_B_D)
+	IN	A,(PPI_C)
 	SCF
-	BIT	1,A
+	BIT	4,A
 	JP 	NZ,I2C_rx_H_FOUND
 I2C_rx_L_FOUND:
 	CCF
@@ -133,7 +126,7 @@ SEND_ACK:
 SCL_CYCLE:
 	CALL	SCL_OUT
 	CALL	SCL_IN
-	IN	A,(PIO_B_D)
+	IN	A,(PPI_C)
 	LD	D,A
 	CALL	SCL_OUT
 	RET
@@ -142,48 +135,36 @@ SCL_CYCLE:
 ; SDA_IN/OUT
 ;--------------------------------------
 SDA_IN:
-	LD	A,(PIO_B_MODE)
-	OUT	(PIO_B_C),A
-
-	LD	A,(PIO_B_CONF)
-	SET	1,A
-	OUT	(PIO_B_C),A
-	LD	(PIO_B_CONF),A
+	LD	A,(PPI_C_CONF)
+	SET	3,A
+	OUT	(PPI_CTL),A
+	LD	(PPI_C_CONF),A
 	RET
 
 SDA_OUT:
-	LD	A,(PIO_B_MODE)
-	OUT	(PIO_B_C),A
-
-	LD	A,(PIO_B_CONF)
-	RES	1,A
-	OUT	(PIO_B_C),A
-	LD	(PIO_B_CONF),A
+	LD	A,(PPI_C_CONF)
+	RES	3,A
+	OUT	(PPI_CTL),A
+	LD	(PPI_C_CONF),A
 	RET
 
 ;--------------------------------------
 ; SCL_IN/OUT
 ;--------------------------------------
 SCL_IN:
-	LD	A,(PIO_B_MODE)
-	OUT	(PIO_B_C),A
-
-	LD	A,(PIO_B_CONF)
+	LD	A,(PPI_C_CONF)
 	SET	0,A
-	OUT	(PIO_B_C),A
-	LD	(PIO_B_CONF),A
+	OUT	(PPI_CTL),A
+	LD	(PPI_C_CONF),A
 	RET
 
 
 
 SCL_OUT:
-	LD	A,(PIO_B_MODE)
-	OUT	(PIO_B_C),A
-
-	LD	A,(PIO_B_CONF)
+	LD	A,(PPI_C_CONF)
 	RES	0,A
-	OUT	(PIO_B_C),A
-	LD	(PIO_B_CONF),A
+	OUT	(PPI_CTL),A
+	LD	(PPI_C_CONF),A
 	RET
 
 ;--------------------------------------
@@ -212,6 +193,5 @@ WORK_TOP	EQU	$
 ;
 ; Wok Area
 ;
-PIO_B_MODE	DS 1
-PIO_B_CONF	DS 1
+PPI_C_CONF	DS 1
 
