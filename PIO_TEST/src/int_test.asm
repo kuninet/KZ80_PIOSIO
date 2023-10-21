@@ -11,24 +11,31 @@ PIO_B_CTL   EQU 0BH
 ;
 
 MAIN:
+;   04100H番地に割り込みベクタテーブルセット
+    LD  A,041H
+    LD  I,A
+    IM 2    ; モード2割り込み
+
+;   割り込み回数カウンタ初期化(デバグ用))
+    LD  A,0
+    LD  (INT_CNT),A
+
+;  PIO-Aを出力、PIO-Bをモード3(ビットモード)&割り込み設定
+
     CALL PIO_INIT
-    CALL PIO_LED
-    RET
 
+;   ポートBのスイッチの状態を、ポートAのLEDヘ
+    IN A,(PIO_B_DATA)
+    OUT (PIO_A_DATA),A
+    EI                  ;割り込み許可
 
-PIO_LED:
-    LD  B,10
+;
 .loop
-;
-    LD  A,0AAh
-    OUT (PIO_A_DATA),A
-    CALL WAIT
-    LD  A,055h
-    OUT (PIO_A_DATA),A
     CALL WAIT
 ;
-    DEC B
-    JR NZ,PIO_LED.loop
+    IN A,(PIO_B_DATA)
+    CP 0FFH
+    JP  NZ,MAIN.loop
     RET
 
 ;
@@ -51,14 +58,24 @@ PIO_INIT:
 ; Port-B割り込みルーチン
 ;
 PBINT:
-    RET
+    DI
+;
+    LD  A,(INT_CNT)
+    INC A
+    LD  (INT_CNT),A
+;
+    CALL WAIT
+    IN A,(PIO_B_DATA)
+    OUT (PIO_A_DATA),A
+    EI                  ;再割り込み許可
+    RETI
 
 ;
 ; WAIT
 ;
 WAIT:
     PUSH DE
-    LD  DE,1000
+    LD  DE,500
 .loop
     CALL WAIT_1
     DEC DE
@@ -85,18 +102,30 @@ WAIT_1:
 ; PIO-A初期化コマンド
 ;
 PIO_A_CMD:
-    DB  00FH
-    DB  007H
+    DB  00FH    ; モード0
+    DB  007H    ; 割り込みコントロール(割り込みなし)
 PIO_A_CMD_LEN   EQU $-PIO_A_CMD
 
 ;
 ; PIO-B初期化コマンド
 ;
 PIO_B_CMD:
-    DB  0CFH
+    DB  0CFH    ; モード3
+    DB  0FFH    ; データディレクション(すべて入力)
+    DB  097H    ; 割り込みコントロール
+    DB  000H    ; 割り込みマスク
+    DB  PIO_B_VECT-INT_VECT_TB ; 割り込みベクタ位置
 PIO_B_CMD_LEN   EQU $-PIO_B_CMD
+
+;
+; WORK
+;
+    org 04200h
+INT_CNT DS  1
+
 ;
 ; 割り込みベクタテーブル
 ;
+    org 04100H
 INT_VECT_TB:
 PIO_B_VECT  DW  PBINT
