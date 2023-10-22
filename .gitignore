@@ -2,4 +2,5 @@
 *.bak
 *.lst
 *.p
-
+*-backups*
+*-bak
